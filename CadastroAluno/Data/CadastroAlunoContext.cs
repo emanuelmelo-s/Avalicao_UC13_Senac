@@ -14,6 +14,6 @@ namespace CadastroAluno.Data
         {
         }
 
-        public DbSet<CadastroAluno.Models.Aluno> Aluno { get; set; }
+        public DbSet<Aluno> Aluno { get; set; }
     }
 }

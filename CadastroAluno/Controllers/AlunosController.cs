@@ -7,34 +7,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CadastroAluno.Data;
 using CadastroAluno.Models;
+using CadastroAluno.Contratos;
 
 namespace CadastroAluno.Controllers
 {
     public class AlunosController : Controller
     {
-        private readonly CadastroAlunoContext _context;
 
-        public AlunosController(CadastroAlunoContext context)
+        private readonly ICadastroAlunoRepository _CadastroClienteRepository;
+
+        public AlunosController(ICadastroAlunoRepository CadastroClienteRepository)
         {
-            _context = context;
+            _CadastroClienteRepository = CadastroClienteRepository;
         }
 
         // GET: Alunos
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Aluno.ToListAsync());
+            return View(await _CadastroClienteRepository.GetAlunos());
         }
 
         // GET: Alunos/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        public async Task<IActionResult> Details(int id)
+        {      
 
-            var aluno = await _context.Aluno
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var aluno = await _CadastroClienteRepository.GetAlunoById(id);
             if (aluno == null)
             {
                 return NotFound();
@@ -58,22 +55,18 @@ namespace CadastroAluno.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(aluno);
-                await _context.SaveChangesAsync();
+                 await _CadastroClienteRepository.AddAluno(aluno);
+                
                 return RedirectToAction(nameof(Index));
             }
             return View(aluno);
         }
 
         // GET: Alunos/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var aluno = await _context.Aluno.FindAsync(id);
+            var aluno = await _CadastroClienteRepository.GetAlunoById(id);
             if (aluno == null)
             {
                 return NotFound();
@@ -97,8 +90,8 @@ namespace CadastroAluno.Controllers
             {
                 try
                 {
-                    _context.Update(aluno);
-                    await _context.SaveChangesAsync();
+                   await _CadastroClienteRepository.UpdateAluno(id, aluno);
+                   
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -117,15 +110,11 @@ namespace CadastroAluno.Controllers
         }
 
         // GET: Alunos/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+           
 
-            var aluno = await _context.Aluno
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var aluno = await _CadastroClienteRepository.GetAlunoById(id);
             if (aluno == null)
             {
                 return NotFound();
@@ -139,15 +128,12 @@ namespace CadastroAluno.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var aluno = await _context.Aluno.FindAsync(id);
-            _context.Aluno.Remove(aluno);
-            await _context.SaveChangesAsync();
+            var aluno = await _CadastroClienteRepository.GetAlunoById(id);
+            _CadastroClienteRepository.DeleteAluno(id);
+            
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AlunoExists(int id)
-        {
-            return _context.Aluno.Any(e => e.Id == id);
-        }
+        
     }
 }
