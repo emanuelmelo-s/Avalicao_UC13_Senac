@@ -63,20 +63,21 @@ namespace CadastroAluno.Controllers
         }
 
         // GET: Alunos/Edit/5
-        public async Task<IActionResult> Edit(int id)
+        public IActionResult Edit(int id)
         {
+            if (id == 0)
+            {
+                return NotFound();
+            }
 
-            var aluno = await _CadastroClienteRepository.GetAlunoById(id);
+            var aluno = _CadastroClienteRepository.GetAlunoById(id);
             if (aluno == null)
             {
                 return NotFound();
             }
-            return View(aluno);
+            return View(aluno.Result);
         }
 
-        // POST: Alunos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Turma,Media")] Aluno aluno)
@@ -88,22 +89,7 @@ namespace CadastroAluno.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                   await _CadastroClienteRepository.UpdateAluno(id, aluno);
-                   
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AlunoExists(aluno.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+               await _CadastroClienteRepository.UpdateAluno(id, aluno);
                 return RedirectToAction(nameof(Index));
             }
             return View(aluno);
@@ -112,7 +98,7 @@ namespace CadastroAluno.Controllers
         // GET: Alunos/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-           
+
 
             var aluno = await _CadastroClienteRepository.GetAlunoById(id);
             if (aluno == null)
@@ -129,7 +115,7 @@ namespace CadastroAluno.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var aluno = await _CadastroClienteRepository.GetAlunoById(id);
-            _CadastroClienteRepository.DeleteAluno(id);
+            await _CadastroClienteRepository.DeleteAluno(id);
             
             return RedirectToAction(nameof(Index));
         }

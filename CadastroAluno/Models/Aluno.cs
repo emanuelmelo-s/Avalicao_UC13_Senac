@@ -15,6 +15,7 @@
 
         public bool VerificaAprovacao() 
             => Media > 5;
+        //Deveria verificar se a aprovação é pela média igual a 5 ou Maior que 5
 
         public void AtualizaMedia(double novaMedia)
         {

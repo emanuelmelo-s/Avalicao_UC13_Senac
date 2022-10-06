@@ -46,6 +46,7 @@ namespace CadastroAluno.Repository
                 return 0;
 
             aluno.AtualizarDados(alunoAlterado.Nome, alunoAlterado.Turma);
+            aluno.AtualizaMedia(alunoAlterado.Media);
 
             _context.Entry(aluno).State = EntityState.Modified;
             return await _context.SaveChangesAsync();
